@@ -17,6 +17,7 @@
 
 
 unsigned char val;
+int direction = 0;
 
 // ThreadController that will controll all threads
 ThreadController controll = ThreadController();
@@ -45,10 +46,12 @@ void setup()
 
 void go_forward() {
   digitalWrite(forward, HIGH);
+  direction = 1;
 }
 
 void go_backward(){
   digitalWrite(backward, HIGH);
+  direction = 2;
 }
 
 void go_right(){
@@ -69,25 +72,40 @@ void stop_left() {
 
 void stop_forward() {
   digitalWrite(forward, LOW);
+  direction = 0;
 }
 
 void stop_backward() {
   digitalWrite(backward, LOW);
+  direction = 0;
 }
 
 void distance_sensor() {
   int duration, distance;
+  unsigned char bytes[4];
   digitalWrite(trigPin, HIGH);
   delayMicroseconds(1000); //pauses the program for 1 millisecond
   digitalWrite(trigPin, LOW);
+  float K_inertia = 0.9; //coefficient for inertia e.g. distance 10*0.9 = 9
   duration = pulseIn(echoPin,HIGH);
   distance = (duration/2) / 29.1;
+  if(direction > 0) {
+    distance *= K_inertia;
+  }
+  /*
   Serial.print("Distance: ");
   Serial.print(distance);
   Serial.print(" cm");
-  Serial.print('\n');
+  Serial.print('\n');*/
   //ble_write(distance); 
  // ble_write_bytes(bytes,5);
+ if(distance == 10) {
+   if(direction == 1) {
+     stop_forward();
+   } else if(direction == 2) (
+     stop_backward();
+   }
+ }
 }
 
 void loop()
