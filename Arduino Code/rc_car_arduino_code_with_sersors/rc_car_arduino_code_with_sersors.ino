@@ -19,6 +19,7 @@
 unsigned char val;
 int direction_ = 0;
 int last_direction = 0;
+int out_of_range = 0;
 
 // ThreadController that will controll all threads
 ThreadController controll = ThreadController();
@@ -103,17 +104,15 @@ void distance_sensor() {
   //ble_write(distance); 
  // ble_write_bytes(bytes,5);
  if(distance <= 10) {
-   if(direction_ == 1) {
-     if(last_direction == 1) {
-       stop_forward();
-     }
-   } else if(direction_ == 2) {
-     if(last_direction == 2) {
-       stop_backward();
-     }
+   if((direction_ == 1) && (last_direction == 1) && (out_of_range == 1)) {
+     stop_forward();
+     out_of_range = 1;
+   }
+   else if((direction_ == 2) && (last_direction == 2) && (out_of_range == 2)) {
+     stop_backward();
+     out_of_range = 2;
    }
  }
-}
 
 void loop()
 {
