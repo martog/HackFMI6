@@ -19,10 +19,12 @@
 unsigned char val;
 int direction_ = 0;
 int last_direction = 0;
+int speed_time = 0;
 
 // ThreadController that will controll all threads
 ThreadController controll = ThreadController();
 Thread distanceThread = Thread();
+Thread speedThread = Thread();
 
 void setup()
 {
@@ -42,7 +44,17 @@ void setup()
   distanceThread.setInterval(10);
   controll.add(&distanceThread);
   
+  distanceThread.onRun(speed_calc);
+  speedThread.setInterval(100);
+  controll.add(&speedThread);
+  
   ble_begin();
+}
+
+void speed_calc() {
+  if(direction_ == 2) {
+    speed_time++;
+  }
 }
 
 void go_forward() {
@@ -84,13 +96,23 @@ void stop_backward() {
   last_direction = 2;
 }
 
+void little_forward() {
+  digitalWrite(forward, HIGH);
+  while(1) {
+    if(speed_time == 2) {
+      break;
+    }
+  }
+  digitalWrite(forward, LOW);
+}
+
 void distance_sensor() {
   int duration, distance;
   unsigned char bytes[4];
   digitalWrite(trigPin, HIGH);
   delayMicroseconds(1000); //pauses the program for 1 millisecond
   digitalWrite(trigPin, LOW);
-  float K_inertia = 0.7; //coefficient for inertia e.g. distance 10*0.9 = 9
+  float K_inertia = 0.75; //coefficient for inertia e.g. distance 10*0.9 = 9
   duration = pulseIn(echoPin,HIGH);
   distance = (duration/2) / 29.1;
   if(direction_ > 0) {
@@ -104,8 +126,10 @@ void distance_sensor() {
   //ble_write(distance); 
  // ble_write_bytes(bytes,5);
  if(distance <= 10) {
-   if(direction_ == 1) {
-     stop_forward();
+   if((direction_ == 2) && (speed_time >= 10)){
+     speed_time = 0;
+     stop_backward();
+     little_forward();
    } 
  }
 }
