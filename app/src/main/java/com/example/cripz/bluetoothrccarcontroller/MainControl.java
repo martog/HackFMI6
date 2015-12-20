@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -30,6 +31,7 @@ public class MainControl extends Activity {
     private ImageButton reverse_button;
     private ImageButton left_button;
     private ImageButton right_button;
+    private Button car_control;
 
     private String mDeviceName;
     private String mDeviceAddress;
@@ -83,7 +85,7 @@ public class MainControl extends Activity {
             }
         }
     };
-    private void sendMessage(String arg) {
+    public void sendMessage(String arg) {
         BluetoothGattCharacteristic characteristic = map.get(RBLService.UUID_BLE_SHIELD_TX);
         characteristic.setValue(arg);
         mBluetoothLeService.writeCharacteristic(characteristic);
@@ -94,12 +96,14 @@ public class MainControl extends Activity {
         reverse_button = (ImageButton) findViewById(R.id.reverse_btn);
         left_button = (ImageButton) findViewById(R.id.left_btn);
         right_button = (ImageButton) findViewById(R.id.right_btn);
+        car_control = (Button) findViewById(R.id.car_control);
 
         MyTouchListener touchListener = new MyTouchListener();
         forward_button.setOnTouchListener(touchListener);
         reverse_button.setOnTouchListener(touchListener);
         left_button.setOnTouchListener(touchListener);
         right_button.setOnTouchListener(touchListener);
+        car_control.setOnTouchListener(touchListener);
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,51 +187,63 @@ public class MainControl extends Activity {
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {switch(v.getId()){
-                case R.id.forward_btn:
-                    //forward button is called
-                    buttonInitialization();
-                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                        forward_button.setImageResource(R.drawable.btn_forward_clicked);
-                        sendMessage("f");
-                    } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                        forward_button.setImageResource(R.drawable.btn_forward);
-                        sendMessage("k");
-                    }
-                    break;
+            case R.id.forward_btn:
+                //forward button is called
+                buttonInitialization();
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    forward_button.setImageResource(R.drawable.btn_forward_clicked);
+                    sendMessage("f");
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    forward_button.setImageResource(R.drawable.btn_forward);
+                    sendMessage("k");
+                }
+                break;
 
-                case R.id.right_btn:
-                    //right button is called
-                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                        right_button.setImageResource(R.drawable.btn_right_clicked);
-                        sendMessage("r");
-                    } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                        right_button.setImageResource(R.drawable.btn_right);
-                        sendMessage("j");
-                    }
-                    break;
+            case R.id.right_btn:
+                //right button is called
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    right_button.setImageResource(R.drawable.btn_right_clicked);
+                    sendMessage("r");
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    right_button.setImageResource(R.drawable.btn_right);
+                    sendMessage("j");
+                }
+                break;
 
-                case R.id.left_btn:
-                    //left button is called
-                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                        left_button.setImageResource(R.drawable.btn_left_clicked);
-                        sendMessage("l");
-                    } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                        left_button.setImageResource(R.drawable.btn_left);
-                        sendMessage("h");
-                    }
-                    break;
+            case R.id.left_btn:
+                //left button is called
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    left_button.setImageResource(R.drawable.btn_left_clicked);
+                    sendMessage("l");
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    left_button.setImageResource(R.drawable.btn_left);
+                    sendMessage("h");
+                }
+                break;
 
-                case R.id.reverse_btn:
-                    //backward button is called
-                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                        reverse_button.setImageResource(R.drawable.btn_reverse_clicked);
-                        sendMessage("b");
-                    } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                        reverse_button.setImageResource(R.drawable.btn_reverse);
-                        sendMessage("g");
-                    }
-                    break;
-            }
+            case R.id.reverse_btn:
+                //backward button is called
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    reverse_button.setImageResource(R.drawable.btn_reverse_clicked);
+                    sendMessage("b");
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    reverse_button.setImageResource(R.drawable.btn_reverse);
+                    sendMessage("g");
+                }
+                break;
+
+            case R.id.car_control:
+                //accelerometer called
+                Intent accelerometer_control = new Intent(MainControl.this,Accelerometer.class);
+
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    startActivity(accelerometer_control);
+
+                }/* else if (event.getAction() == MotionEvent.ACTION_UP) {
+
+                    }*/
+                break;
+        }
             return true;
         }
     }

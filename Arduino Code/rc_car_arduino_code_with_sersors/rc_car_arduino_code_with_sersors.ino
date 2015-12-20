@@ -37,7 +37,7 @@ void setup()
   pinMode(left, OUTPUT);
 
   distanceThread.onRun(distance_sensor);
-  distanceThread.setInterval(500);
+  distanceThread.setInterval(10);
   controll.add(&distanceThread);
   
   ble_begin();
@@ -77,7 +77,6 @@ void stop_backward() {
 
 void distance_sensor() {
   int duration, distance;
-  unsigned char bytes[4];
   digitalWrite(trigPin, HIGH);
   delayMicroseconds(1000); //pauses the program for 1 millisecond
   digitalWrite(trigPin, LOW);

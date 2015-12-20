@@ -1,5 +1,6 @@
 package com.example.cripz.bluetoothrccarcontroller;
 
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import java.util.ArrayList;
@@ -25,7 +26,9 @@ public class Main extends AppCompatActivity {
     private static final long SCAN_PERIOD = 3000;
     private MaterialDialog mDialog;
     public static ArrayList<BluetoothDevice> mDevices = new ArrayList<>();
+    String[] arr = new String[20];
     public static Main instance = null;
+    public final static String EXTRA_DEVICE_NAME = "EXTRA_DEVICE_NAME";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,12 +80,36 @@ public class Main extends AppCompatActivity {
 
             @Override
             public void run() {
-                Intent deviceListIntent = new Intent(getApplicationContext(),
-                        Device.class);
-                startActivity(deviceListIntent);
+                showAvailableDevices();
                 mDialog.dismiss();
             }
         }, SCAN_PERIOD);
+    }
+
+    private void showAvailableDevices() {
+        Looper.prepare();
+        MaterialDialog.Builder builder = new MaterialDialog.Builder(this);
+        if(mDevices.size()==0){
+            builder.title("No Devices found.");
+        }
+        else {
+            for(int i = 0; i < mDevices.size();i++){
+                arr[i] = mDevices.get(i).getName();
+            }
+            builder.items(arr);
+            builder.itemsCallback(new MaterialDialog.ListCallback() {
+                @Override
+                public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                    String name = arr[which];
+                    Intent intent = new Intent(Main.this, MainControl.class);
+                    intent.putExtra(EXTRA_DEVICE_NAME, name);
+                    startActivity(intent);
+                    instance.finish(); // destroy the Main Activity
+                    finish(); // destroy Device Activity
+                }
+            });
+            builder.show();
+        }
     }
 
     public void buildRoundProcessDialog(Context mContext) {
